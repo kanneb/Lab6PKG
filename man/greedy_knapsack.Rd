@@ -18,7 +18,7 @@ A list with two elements:
  \item{elements}{The row numbers of the selected items in \code{x}}
 }
 \description{
-Solves the 0-1 knapsack problem approximately by sorting items on value
+Solves the knapsack problem approximately by sorting items on value
 per unit of weight and adding them in that order until the next item
 no longer fits. An efficient way but not a guaranteed way to find
 the optimal solution.

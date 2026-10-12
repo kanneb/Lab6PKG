@@ -8,6 +8,7 @@
 #'@returns A \code{list} with the combined \code{value} of the elements and
 #'          and which \code{elements} they are.
 #'@references \url{https://en.wikipedia.org/wiki/Knapsack_problem}
+#'@importFrom Rcpp sourceCpp
 #'@export
 
 brute_force_knapsack = function(x , W){
