@@ -8,9 +8,9 @@ greedy_knapsack(x, W)
 }
 \arguments{
 \item{x}{an object of class data.frame with two numeric columns: \code{w} (weights)
-and \code{v} (values). All numbers must be positive}
+and \code{v} (values). All integers must be positive}
 
-\item{W}{A positive number, the knapsack capacity.}
+\item{W}{A positive integer, the knapsack capacity.}
 }
 \value{
 A list with two elements:
@@ -37,6 +37,7 @@ res1$elements
 res2 <- greedy_knapsack(x = knapsack_objects[1:1200,], W = 2000)
 res2$value
 res2$elements
+
 }
 \references{
 \url{en.wikipedia.org/wiki/Knapsack problem#Greedy approximation algorithm}
