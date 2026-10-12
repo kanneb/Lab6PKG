@@ -35,3 +35,18 @@ knapsack_dynamic <- function(x, W){
 
 #knapsack_dynamic(x = knapsack_objects[1:8,], W = 2000)
 #knapsack_dynamic(x = knapsack_objects[1:12,], W = 3500)
+
+# Runtime of algorithm
+
+tmp <- tempfile()
+Rprof(tmp, memory.profiling = TRUE)
+
+for (k in 1:20) {
+  knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500)
+}
+
+Rprof(NULL)
+test <- summaryRprof(tmp, memory = "both"); test$by.total[1,]
+
+# 5.36 seconds to run the whole function
+
