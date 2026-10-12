@@ -37,16 +37,14 @@ knapsack_dynamic <- function(x, W){
 #knapsack_dynamic(x = knapsack_objects[1:12,], W = 3500)
 
 # Runtime of algorithm
+rt <- matrix(0, nrow = 10, ncol = 3)
+colnames(rt) <- c("user", "system", "elapsed")
 
-tmp <- tempfile()
-Rprof(tmp, memory.profiling = TRUE)
-
-for (k in 1:20) {
-  knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500)
+for (i in 1:10) {
+  rt[i,] <- system.time(knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500))[1:3]
 }
 
-Rprof(NULL)
-test <- summaryRprof(tmp, memory = "both"); test$by.total[1,]
+mean(rt[,1])
 
-# 5.36 seconds to run the whole function
+# Mean of systemtime when the function run 10 times is 0.399 for the given run
 
