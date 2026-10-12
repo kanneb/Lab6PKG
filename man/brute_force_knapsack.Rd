@@ -4,13 +4,15 @@
 \alias{brute_force_knapsack}
 \title{Knapsack brute force search}
 \usage{
-brute_force_knapsack(x, W)
+brute_force_knapsack(x, W, fast = FALSE)
 }
 \arguments{
 \item{x}{A \code{data.frame} which has the weight in column \code{w}
 and the value in column \code{v}}
 
 \item{W}{A weight limit the function should solve for}
+
+\item{fast}{A \code{boolean} value to either run function with R or C++}
 }
 \value{
 A \code{list} with the combined \code{value} of the elements and

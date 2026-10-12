@@ -5,13 +5,14 @@
 #'@param x A \code{data.frame} which has the weight in column \code{w}
 #'          and the value in column \code{v}
 #'@param W A weight limit the function should solve for
+#'@param fast A \code{boolean} value to either run function with R or C++
 #'@returns A \code{list} with the combined \code{value} of the elements and
 #'          and which \code{elements} they are.
 #'@references \url{https://en.wikipedia.org/wiki/Knapsack_problem}
-#'@importFrom Rcpp sourceCpp
 #'@export
 
-brute_force_knapsack = function(x , W){
+brute_force_knapsack = function(x , W, fast = FALSE){
+
 
   stopifnot(is.data.frame(x),
             all(c("w","v") %in% names(x)),
@@ -19,6 +20,10 @@ brute_force_knapsack = function(x , W){
             all(x$w > 0),
             W > 0
             )
+
+  if (fast) {
+    return(brute_force_cpp(x$w, x$v, W))
+  }
 
   result <- list(value = 0, elements = NULL)
 
@@ -63,3 +68,8 @@ brute_force_knapsack = function(x , W){
 
 #ans <- brute_force_knapsack(x = knapsack_objects[1:8,], W = 2000)
 #print(ans)
+
+#system.time(brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000))
+
+#system.time(brute_force_knapsack(x = knapsack_objects[1:16,], W = 2000, fast = TRUE))
+
