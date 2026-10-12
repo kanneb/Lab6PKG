@@ -4,8 +4,13 @@ Title: What the Package Does (Title Case)
 Version: 0.1.0
 Authors@R: c(
     person(
-      "Jane", "Doe",
-      email = "jane@example.com",
+      "Alfred", "Rosberg",
+      email = "alfro937@student.liu.se",
+      role = c("aut")
+    ),
+    person(
+      "Kandes", "Ghebregziabiher",
+      email = "kangh634@student.liu.se",
       role = c("aut", "cre")
     )
   )
@@ -21,3 +26,5 @@ Suggests:
 VignetteBuilder: knitr
 Config/roxygen2/version: 8.1.0
 Config/testthat/edition: 3
+RoxygenNote: 7.3.3
+
