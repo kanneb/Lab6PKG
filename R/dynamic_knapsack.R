@@ -1,5 +1,5 @@
 set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-n <- 2000
+n <- 500
 knapsack_objects <- data.frame(w = sample(1:4000, size = n, replace = TRUE),
                                v = runif(n = n, 0, 10000))
 
@@ -41,10 +41,10 @@ rt <- matrix(0, nrow = 10, ncol = 3)
 colnames(rt) <- c("user", "system", "elapsed")
 
 for (i in 1:10) {
-  rt[i,] <- system.time(knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500))[1:3]
+  rt[i,] <- system.time(knapsack_dynamic(x = knapsack_objects, W = 3500))[1:3]
 }
 
-mean(rt[,1])
+mean(rt[,"elapsed"])
 
-# Mean of systemtime when the function run 10 times is 0.399 for the given run
+# Mean of systemtime when the function run 10 times is 0.415 for the given run
 
