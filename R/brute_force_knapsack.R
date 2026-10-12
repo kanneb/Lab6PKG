@@ -2,10 +2,13 @@
 #'
 #'Solves a knapsack problem using brute force search
 #'
-#'
+#'@param x A \code{data.frame} which has the weight in column \code{w}
+#'          and the value in column \code{v}
+#'@param W A weight limit the function should solve for
+#'@returns A \code{list} with the combined \code{value} of the elements and
+#'          and which \code{elements} they are.
 #'@references \url{https://en.wikipedia.org/wiki/Knapsack_problem}
-#'
-
+#'@export
 
 brute_force_knapsack = function(x , W){
 
@@ -42,23 +45,20 @@ brute_force_knapsack = function(x , W){
   return(result)
 
 
-
-
 }
 
-RNGversion(min(as.character(getRversion()),"3.5.3"))
+#RNGversion(min(as.character(getRversion()),"3.5.3"))
 
-set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+#set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
 
-n <- 2000
+#n <- 2000
 
-knapsack_objects <- data.frame(
-  w = sample(1:4000, size = n, replace = TRUE),
-  v = runif(n = n, 0, 10000)
-)
+#knapsack_objects <- data.frame(
+#  w = sample(1:4000, size = n, replace = TRUE),
+#  v = runif(n = n, 0, 10000)
+#)
 
-head(knapsack_objects)
+#head(knapsack_objects)
 
-
-ans <- brute_force_knapsack(x = knapsack_objects[1:8,], W = 2000)
-print(ans)
+#ans <- brute_force_knapsack(x = knapsack_objects[1:8,], W = 2000)
+#print(ans)
