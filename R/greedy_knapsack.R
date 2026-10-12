@@ -6,12 +6,10 @@
 #' the optimal solution.
 #'
 #' @param x an object of class data.frame with two numeric columns: \code{w} (weights)
-#'   and \code{v} (values). All numbers must be positive
-#' @param W A positive number, the knapsack capacity.
+#'   and \code{v} (values). All integers must be positive
+#' @param W A positive integer, the knapsack capacity.
 #'
 #' @importFrom dplyr mutate arrange desc row_number %>%
-#'
-#' @export
 #'
 #' @return A list with two elements:
 #'  \item{value}{The total value of the selected items}
@@ -33,6 +31,8 @@
 #' res2 <- greedy_knapsack(x = knapsack_objects[1:1200,], W = 2000)
 #' res2$value
 #' res2$elements
+#'
+#' @export
 greedy_knapsack <- function(x, W){
   stopifnot("W has to be positive" = W >= 0)
   stopifnot("x has to be of class data.frame" = is.data.frame(x))
