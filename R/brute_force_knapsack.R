@@ -29,10 +29,11 @@ brute_force_knapsack = function(x , W, fast = FALSE){
 
   weights <- x$w
   values <- x$v
+  n = nrow(x)
 
-  for(combination in 1:(2^nrow(x))){
+  for(combination in 1:(2^n)){
 
-    binary_combination <- as.integer(intToBits(combination))[1:nrow(x)]
+    binary_combination <- as.integer(intToBits(combination))[1:n]
     elements <- binary_combination == 1
 
     idx_weights <- weights[elements]

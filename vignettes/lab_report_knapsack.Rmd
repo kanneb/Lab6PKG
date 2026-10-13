@@ -17,3 +17,91 @@ knitr::opts_chunk$set(
 ```{r setup}
 library(Lab6PKG)
 ```
+
+## Data
+
+```{r, warning = FALSE}
+library(Lab6PKG)
+library(bench)
+
+RNGversion(min(as.character(getRversion()), "3.5.3"))
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 2000
+knapsack_objects <- data.frame(
+  w = sample(1:4000, size = n, replace = TRUE),
+  v = runif(n = n, 0, 10000)
+)
+```
+
+All timings are measured when the vignette is built, so they depend on the computer used.
+
+## 1.1.2 Brute force search
+
+```{r, warning = FALSE}
+bench::mark(
+  brute_force_knapsack(knapsack_objects[1:16, ], W = 2000),
+  min_iterations = 10
+)[, c("min", "median", "itr/sec")]
+```
+
+**Question: How much time does it takes to run the algorithm for n = 16 objects?**
+
+The run time of `brute_force_knapsack()` for n = 16 is shown in the table above. The algorithm goes through all 2^16 = 65 536 combinations, so the time doubles with every extra object.
+
+## 1.1.6 Profile and optimize
+
+**Question: What performance gain could you get by trying to improving your code?**
+
+### brute_force_knapsack
+
+`brute_force_knapsack()` was profiled with `profvis` on the first 16 rows, with the call repeated 10 times to get enough samples.
+
+```{r, eval = FALSE}
+profvis::profvis({
+  for (i in 1:10) {
+    ans <- brute_force_knapsack(x = knapsack_objects[1:16, ], W = 2000)
+  }
+})
+```
+
+The profile showed that `nrow(x)` took the largest share of the time. It was called in every loop iteration, and for a data frame it goes through `dim.data.frame`, which is slow when repeated 65 535 times. Computing `nrow(x)` once before the loop removed this bottleneck.
+
+```{r, eval = FALSE}
+# Before
+for (combination in 1:(2^nrow(x))) {
+  binary_combination <- as.integer(intToBits(combination))[1:nrow(x)]
+  ...
+}
+
+# After
+n <- nrow(x)
+for (combination in 1:(2^n)) {
+  binary_combination <- as.integer(intToBits(combination))[1:n]
+  ...
+}
+```
+
+Run time before and after the change, measured once during development with `bench::mark()` (n = 16, W = 2000, at least 10 iterations):
+
+| Version | min | median |
+|---|---|---|
+| Before | 356 ms | 361 ms |
+| After | 215 ms | 225 ms |
+
+The change made the function about 1.6 times faster (median 361 ms to 225 ms). The run time of the current version, measured when the vignette is built, is shown in the table in section 1.1.2.
+
+## 1.1.7 Rcpp
+
+`brute_force_knapsack()` has the argument `fast`. With `fast = TRUE` the search is done by a C++ function written with Rcpp instead of the R loop.
+
+```{r, warning = FALSE}
+bench::mark(
+  R   = brute_force_knapsack(knapsack_objects[1:16, ], W = 2000),
+  Cpp = brute_force_knapsack(knapsack_objects[1:16, ], W = 2000, fast = TRUE),
+  check = TRUE, min_iterations = 10
+)[, c("expression", "min", "median", "itr/sec")]
+```
+
+**Question: What performance gain could you get by using Rcpp and C++?**
+
+The table compares the R version and the C++ version of `brute_force_knapsack()` on the same input (n = 16, W = 2000). Both versions return the same result (`check = TRUE`).
