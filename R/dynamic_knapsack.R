@@ -30,8 +30,13 @@
 #'
 #' @export
 knapsack_dynamic <- function(x, W){
-  stopifnot("W has to be positive" = W >= 0)
-  stopifnot("x has to be of class data.frame" = is.data.frame(x))
+
+  stopifnot(is.data.frame(x),
+            all(c("w","v") %in% names(x)),
+            all(x$v > 0),
+            all(x$w > 0),
+            W > 0
+  )
 
   n <- nrow(x)
   m <- matrix(0, nrow = n + 1, ncol = W + 1)

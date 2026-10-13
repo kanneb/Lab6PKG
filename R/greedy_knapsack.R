@@ -34,8 +34,17 @@
 #'
 #' @export
 greedy_knapsack <- function(x, W){
-  stopifnot("W has to be positive" = W >= 0)
-  stopifnot("x has to be of class data.frame" = is.data.frame(x))
+
+  stopifnot(is.data.frame(x),
+            all(c("w","v") %in% names(x)),
+            all(x$v > 0),
+            all(x$w > 0),
+            W > 0
+  )
+
+  v <- x$v
+  w <- x$w
+  ratio <- NULL
 
   sorted <- x %>%
     mutate(
