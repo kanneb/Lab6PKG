@@ -30,25 +30,19 @@
 #'
 #' @export
 knapsack_dynamic <- function(x, W){
-
-  stopifnot(is.data.frame(x),
-            all(c("w","v") %in% names(x)),
-            all(x$v > 0),
-            all(x$w > 0),
-            W > 0
-  )
+  stopifnot("W has to be positive" = W >= 0)
+  stopifnot("x has to be of class data.frame" = is.data.frame(x))
 
   n <- nrow(x)
   m <- matrix(0, nrow = n + 1, ncol = W + 1)
 
   for (i in 1:n) {
     wi <- x$w[i]; vi <- x$v[i]
-    for (j in 0:W) {
-      if(wi > j){
-        m[i + 1, j + 1] <- m[i, j + 1]
-      } else {
-        m[i + 1, j + 1] <- max(m[i, j + 1], m[i,j - wi] + vi)
-      }
+    m[i + 1, ] <- m[i, ]
+
+    if (wi <= W) {
+      idx <- (wi + 1):(W + 1)
+      m[i + 1, idx] <- pmax(m[i, idx], m[i, idx - wi] + vi)
     }
   }
 
