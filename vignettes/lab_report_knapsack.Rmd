@@ -16,17 +16,17 @@ knitr::opts_chunk$set(
 
 ```{r setup}
 library(Lab6PKG)
-require(dplyr)
-require(knitr)
-require(kableExtra)
 ```
 
 
 ## Data
 
-```{r, warning = FALSE}
+```{r, warning = FALSE, message=FALSE}
 library(Lab6PKG)
 library(bench)
+library(dplyr)
+library(kableExtra)
+library(knitr)
 
 RNGversion(min(as.character(getRversion()), "3.5.3"))
 set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
@@ -51,6 +51,57 @@ bench::mark(
 **Question: How much time does it takes to run the algorithm for n = 16 objects?**
 
 The run time of `brute_force_knapsack()` for n = 16 is shown in the table above. The algorithm goes through all 2^16 = 65 536 combinations, so the time doubles with every extra object.
+
+## 1.1.3 Dynamic Programming
+
+```{r}
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 500
+knapsack_objects <- data.frame(w = sample(1:4000, size = n, replace = TRUE),
+                               v = runif(n = n, 0, 10000))
+
+# Runtime of algorithm
+rt <- matrix(0, nrow = 10, ncol = 3)
+colnames(rt) <- c("user", "system", "elapsed")
+
+for (i in 1:10) {
+  rt[i,] <- system.time(knapsack_dynamic(x = knapsack_objects, W = 3500))[1:3]
+}
+
+m_t_113 <- mean(rt[,"elapsed"]) 
+
+m_t_113 %>% kable(caption = "Average time to run greedy_knapsack algorithm (Unit: Seconds)") %>% kable_styling("striped")
+```
+
+**Question: How much time does it takes to run the algorithm for n = 500 objects?**
+
+The average time to run knapsack_dynamic algorithm is `r m_t_113` seconds, running the algorithm 10 times in a for loop. 
+
+
+## 1.1.4 Greedy heuristic
+
+```{r}
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 1000000
+knapsack_objects <- data.frame(w = sample(1:4000, size = n, replace = TRUE),
+                               v = runif(n = n, 0, 10000))
+
+# Runtime of algorithm
+rt <- matrix(0, nrow = 10, ncol = 3)
+colnames(rt) <- c("user", "system", "elapsed")
+
+for (i in 1:10) {
+  rt[i,] <- system.time(greedy_knapsack(x = knapsack_objects, W = 2000))[1:3]
+}
+
+m_t_114 <- mean(rt[,"elapsed"]) 
+
+m_t_114 %>% kable(caption = "Average time to run greedy_knapsack algorithm (Unit: Seconds)") %>% kable_styling("striped")
+```
+
+**Question: How much time does it takes to run the algorithm for n = 1000000 objects?**
+
+The average time to run greedy_knapsack algorithm is `r m_t_114` seconds, running the algorithm 10 times in a for loop. 
 
 ## 1.1.6 Profile and optimize
 
@@ -94,6 +145,27 @@ Run time before and after the change, measured once during development with `ben
 
 The change made the function about 1.6 times faster (median 361 ms to 225 ms). The run time of the current version, measured when the vignette is built, is shown in the table in section 1.1.2.
 
+### Dynamic Programming
+
+```{r}
+tab_dynamic <- rbind(c("dyn_old", 691.70407, 698.06776, 780.91645, 827.46073, 837.75927, 856.1270, 10),
+                     c("dyn_new", 50.14218,  52.45257,  89.03034,  62.53189,  76.85917, 211.7202, 10)) %>% as.data.frame()
+colnames(tab_dynamic) <- c("expr", "min", "lq", "mean", "median", "uq", "max", "neval")
+tab_dynamic %>% kable(caption = "Performance comparison (Dynamic programming, Unit: Milliseconds)") %>% kable_styling("striped")
+```
+By vectorisiing the code in knapsack dynamic programming problem, we could gain almost a 6 tenths of a second on the mean column. Which is an improvement in this case using more vectorisation.
+
+### Greedy heuristic
+
+```{r}
+tab_greedy <- rbind(c("gre_old", 1323.111, 1338.691, 1435.312, 1349.3920, 1358.494, 2142.004, 10),
+                    c("gre_new", 139.113,  140.425,  148.789,  146.1855,  148.666,  180.646, 10)) %>% as.data.frame()
+colnames(tab_greedy) <- c("expr", "min", "lq", "mean", "median", "uq", "max", "neval")
+tab_greedy %>% kable(caption = "Performance comparison (Greedy heuristic, Unit: Milliseconds)") %>% kable_styling("striped")
+```
+By also using vectorisation on this greedy heurstic knapsack problemm, we could gain almost a second on the mean column. We can se an improvement on code in this case using vectorisation.
+
+
 ## 1.1.7 Rcpp
 
 `brute_force_knapsack()` has the argument `fast`. With `fast = TRUE` the search is done by a C++ function written with Rcpp instead of the R loop.
@@ -110,69 +182,4 @@ bench::mark(
 
 The table compares the R version and the C++ version of `brute_force_knapsack()` on the same input (n = 16, W = 2000). Both versions return the same result (`check = TRUE`).
 
-### 1.1.3
 
-```{r}
-set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-n <- 500
-knapsack_objects <- data.frame(w = sample(1:4000, size = n, replace = TRUE),
-                               v = runif(n = n, 0, 10000))
-
-# Runtime of algorithm
-rt <- matrix(0, nrow = 10, ncol = 3)
-colnames(rt) <- c("user", "system", "elapsed")
-
-for (i in 1:10) {
-  rt[i,] <- system.time(knapsack_dynamic(x = knapsack_objects, W = 3500))[1:3]
-}
-
-m_t_113 <- mean(rt[,"elapsed"]) 
-
-m_t_113 %>% kable(caption = "Average time to run greedy_knapsack algorithm (Unit: Seconds)") %>% kable_styling("striped")
-```
-The average time to run knapsack_dynamic algorithm is `r m_t_113` seconds, running the algorithm 10 times in a for loop. 
-
-
-
-### 1.1.4
-
-```{r}
-set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
-n <- 1000000
-knapsack_objects <- data.frame(w = sample(1:4000, size = n, replace = TRUE),
-                               v = runif(n = n, 0, 10000))
-
-# Runtime of algorithm
-rt <- matrix(0, nrow = 10, ncol = 3)
-colnames(rt) <- c("user", "system", "elapsed")
-
-for (i in 1:10) {
-  rt[i,] <- system.time(greedy_knapsack(x = knapsack_objects, W = 2000))[1:3]
-}
-
-m_t_114 <- mean(rt[,"elapsed"]) 
-
-m_t_114 %>% kable(caption = "Average time to run greedy_knapsack algorithm (Unit: Seconds)") %>% kable_styling("striped")
-```
-The average time to run greedy_knapsack algorithm is `r m_t_114` seconds, running the algorithm 10 times in a for loop. 
-
-
-### 1.1.6
-
-```{r}
-tab_dynamic <- rbind(c("dyn_old", 691.70407, 698.06776, 780.91645, 827.46073, 837.75927, 856.1270, 10),
-                     c("dyn_new", 50.14218,  52.45257,  89.03034,  62.53189,  76.85917, 211.7202, 10)) %>% as.data.frame()
-colnames(tab_dynamic) <- c("expr", "min", "lq", "mean", "median", "uq", "max", "neval")
-tab_dynamic %>% kable(caption = "Performance comparison (Dynamic programming, Unit: Milliseconds)") %>% kable_styling("striped")
-```
-By vectorisiing the code in knapsack dynamic programming problem, we could gain almost a 6 tenths of a second on the mean column. Which is an improvement in this case using more vectorisation.
-
-
-
-```{r}
-tab_greedy <- rbind(c("gre_old", 1323.111, 1338.691, 1435.312, 1349.3920, 1358.494, 2142.004, 10),
-                    c("gre_new", 139.113,  140.425,  148.789,  146.1855,  148.666,  180.646, 10)) %>% as.data.frame()
-colnames(tab_greedy) <- c("expr", "min", "lq", "mean", "median", "uq", "max", "neval")
-tab_greedy %>% kable(caption = "Performance comparison (Greedy heuristic, Unit: Milliseconds)") %>% kable_styling("striped")
-```
-By also using vectorisation on this greedy heurstic knapsack problemm, we could gain almost a second on the mean column. We can se an improvement on code in this case using vectorisation.
