@@ -19,38 +19,59 @@ knitr::opts_chunk$set(
 [![R-CMD-check](https://github.com/kanneb/Lab6PKG/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/kanneb/Lab6PKG/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
-The goal of Lab6PKG is to ...
+Lab6PKG solves the knapsack problem with three methods: brute force search, dynamic programming and a greedy heuristic. The brute force search can also run in C++ with Rcpp.
 
 ## Installation
 
-You can install the development version of Lab6PKG from [GitHub](https://github.com/) with:
+Install from GitHub. Set the option first if you also want the vignette:
 
 ``` r
 # install.packages("pak")
+options(pkg.build_vignettes = TRUE)
 pak::pak("kanneb/Lab6PKG")
 ```
 
-## Example
+## Examples
 
-This is a basic example which shows you how to solve a common problem:
+The data is generated as following. `x` needs a weight column `w` and a value column `v`, and `W` is the size of the knapsack.
 
-```{r example}
+```{r data}
 library(Lab6PKG)
-## basic example code
+
+suppressWarnings(RNGversion(min(as.character(getRversion()), "3.5.3")))
+set.seed(42, kind = "Mersenne-Twister", normal.kind = "Inversion")
+n <- 2000
+knapsack_objects <- data.frame(
+  w = sample(1:4000, size = n, replace = TRUE),
+  v = runif(n = n, 0, 10000)
+)
 ```
 
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
+Brute force search goes through all combinations, so keep `n` small. Use `fast = TRUE` to run the search in C++:
 
-```{r cars}
-summary(cars)
+```{r brute}
+brute_force_knapsack(x = knapsack_objects[1:8, ], W = 3500)
+brute_force_knapsack(x = knapsack_objects[1:8, ], W = 3500, fast = TRUE)
 ```
 
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
+Dynamic programming gives the exact answer and works with larger `n`, as long as the weights are integers:
 
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
+```{r dynamic}
+knapsack_dynamic(x = knapsack_objects[1:500, ], W = 3500)
 ```
 
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
+The greedy heuristic is the fastest but only approximate:
+
+```{r greedy}
+greedy_knapsack(x = knapsack_objects[1:800, ], W = 3500)
+```
+
+All functions return a list with the total `value` and the row numbers in `elements`.
+
+## More
+
+The vignette contains the lab report with timings and answers to the questions:
+
+``` r
+browseVignettes("Lab6PKG")
+```
