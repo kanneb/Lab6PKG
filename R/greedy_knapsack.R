@@ -42,26 +42,17 @@ greedy_knapsack <- function(x, W){
             W > 0
   )
 
-  v <- x$v
-  w <- x$w
-  ratio <- NULL
-
-  sorted <- x %>%
-    mutate(
-      id = row_number(),
-      ratio = v/w
-    ) %>%
-    arrange(desc(ratio))
+  order <- order(x$v / x$w, decreasing = TRUE)
 
   tw <- 0
   tv <- 0
   elements <- c()
 
-  for (i in 1:nrow(sorted)) {
-    if(tw + sorted$w[i] > W) break
-      tw <- tw + sorted$w[i]
-      tv <- tv + sorted$v[i]
-      elements <- c(sorted$id[i], elements)
+  for (i in order) {
+    if(tw + x$w[i] > W) break
+      tw <- tw + x$w[i]
+      tv <- tv + x$v[i]
+      elements <- c(i, elements)
   }
 
   return(list(value = round(tv), elements = elements))
