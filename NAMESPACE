@@ -4,11 +4,4 @@ export(brute_force_knapsack)
 export(greedy_knapsack)
 export(knapsack_dynamic)
 importFrom(Rcpp,sourceCpp)
-importFrom(dplyr,
-  "%>%",
-  arrange,
-  desc,
-  mutate,
-  row_number
-)
 useDynLib(Lab6PKG, .registration = TRUE)
