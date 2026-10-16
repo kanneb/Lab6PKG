@@ -9,8 +9,6 @@
 #'   and \code{v} (values). All integers must be positive
 #' @param W A positive integer, the knapsack capacity.
 #'
-#' @importFrom dplyr mutate arrange desc row_number %>%
-#'
 #' @return A list with two elements:
 #'  \item{value}{The total value of the selected items}
 #'  \item{elements}{The row numbers of the selected items in \code{x}}
